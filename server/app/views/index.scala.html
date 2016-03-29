@@ -1,0 +1,28 @@
+@*
+ * This template takes a single argument, a String containing a
+ * message to display.
+ *@
+@(message: List[String], warning:List[String])
+@import play.api.libs.json._
+
+
+@*
+ * Call the the `main` template with two arguments. The first
+ * argument is a `String` with the title of the page, the second
+ * argument is an `Html` object containing the body of the page.
+ *@
+
+@content = {
+<script>
+   com.knoldus.DashboardClient().main()
+</script>
+}
+
+@main("Welcome to Play", content = content) {
+<script>
+ var items = @Html(Json.toJson(message.map(a => a)).toString);
+ var warn = @Html(Json.toJson(warning.map(a => a)).toString);
+  com.knoldus.DashboardClient().displayXML(items,warn)
+</script>
+
+}
