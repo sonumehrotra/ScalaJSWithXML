@@ -40,3 +40,17 @@ addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.8.0")
 addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "2.5.0")
 
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.3.5")
+
+// Plugin to Format source code
+resolvers += Resolver.typesafeRepo("releases")
+
+addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.6.0")
+
+// Plugin for source code statistics and analytics
+addSbtPlugin("com.orrsella" % "sbt-stats" % "1.0.5")
+
+// Statis code analysis library
+addSbtPlugin("com.sksamuel.scapegoat" %% "sbt-scapegoat" % "1.0.4")
+
+
+addSbtPlugin("de.johoop" % "cpd4sbt" % "1.1.5")

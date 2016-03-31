@@ -1,15 +1,16 @@
 @*
- * This template takes a single argument, a String containing a
- * message to display.
+ * This template takes the results of all the reports and sends them
+ * to ScalaJs to display.
  *@
-@(message: List[String], warning:List[String])
+@(projectList: List[String], warning:List[String],scapegoatResult:List[List[String]],scoverageResult:List[String],cpdResult:List[String],time:Int)
 @import play.api.libs.json._
 
 
 @*
- * Call the the `main` template with two arguments. The first
+ * Call the the `main` template with three arguments. The first
  * argument is a `String` with the title of the page, the second
- * argument is an `Html` object containing the body of the page.
+ * argument is an `Html` object containing the body of the page and third is an
+ * `Int` with the duration to refresh page in seconds.
  *@
 
 @content = {
@@ -18,11 +19,14 @@
 </script>
 }
 
-@main("Welcome to Play", content = content) {
+@main("Knoldus Dashboard", content = content, time = time) {
 <script>
- var items = @Html(Json.toJson(message.map(a => a)).toString);
+ var projects = @Html(Json.toJson(projectList.map(a => a)).toString);
  var warn = @Html(Json.toJson(warning.map(a => a)).toString);
-  com.knoldus.DashboardClient().displayXML(items,warn)
+ var scapegoat = @Html(Json.toJson(scapegoatResult.map(a => a )).toString);
+ var scoverage = @Html(Json.toJson(scoverageResult.map( a => a)).toString);
+ var cpd =  @Html(Json.toJson(cpdResult.map( a => a)).toString);
+ com.knoldus.DashboardClient().displayDashboardTable(projects,warn,scapegoat,scoverage,cpd)
 </script>
 
 }

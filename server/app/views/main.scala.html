@@ -1,30 +1,35 @@
 @*
- * This template is called from the `index` template. This template
- * handles the rendering of the page header and body tags. It takes
- * two arguments, a `String` for the title of the page and an `Html`
- * object to insert into the body of the page.
- *@
-@(title: String,content: Html = Html(""))(javascripts: Html)
+* This template is called from the `index` template. This template
+* handles the rendering of the page header and body tags. It takes
+* three arguments, a `String` for the title of the page and an `Html`
+* object to insert into the body of the page and an `Int` for refreshing the
+* page after a set interval.
+*@
+@(title: String,content: Html = Html(""),time:Int)(javascripts: Html)
 @import play.api.Play
 
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        @* Here's where we render the page title `String`. *@
-        <title>@title</title>
-        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
-        <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
-        <script src="@routes.Assets.versioned("javascripts/hello.js")" type="text/javascript"></script>
-    </head>
-    <body>
-        @* And here's where we render the `Html` object containing
-         * the page content. *@
-         <div id="content">
-         </div>
-         <div>
+<head>
+    <title>@title</title>
+    <meta http-equiv="refresh" content="@time">
+    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
+    <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
+    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/bootstrap.min.css")">
+    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/custom.css")">
+    <script src="@routes.Assets.versioned("javascripts/hello.js")" type="text/javascript"></script>
+	<script type="text/javascript" src="jquery-1.12.0.min.js"></script>
+</head>
+<body>
+@* And here's where we render the `Html` object containing
+* the page content. *@
+<div id="bodyContent" class="container">
+
+    <div>
         @content
-        </div>
-        @playscalajs.html.scripts("client")
-        @javascripts
-    </body>
+    </div>
+</div>
+@playscalajs.html.scripts("client")
+@javascripts
+</body>
 </html>

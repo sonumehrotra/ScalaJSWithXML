@@ -4,7 +4,9 @@ version := "1.0-SNAPSHOT"
 
 import sbt.Keys._
 import sbt.Project.projectToRef
+import de.johoop.cpd4sbt.CopyPasteDetector._
 
+seq(cpdSettings : _*)
 lazy val clients = Seq(client)
 lazy val scalaV = "2.11.7"
 
@@ -13,8 +15,25 @@ lazy val server = (project in file("server")).settings(
   scalaJSProjects := clients,
   pipelineStages := Seq(scalaJSProd, gzip),
   resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
+  jsManifestFilter := {
+    import org.scalajs.core.tools.jsdep.{JSDependencyManifest, JSDependency}
 
+    (seq: Traversable[JSDependencyManifest]) => {
+      seq map { manifest =>
 
+        def isOkToInclude(jsDep: JSDependency): Boolean = {
+          jsDep.resourceName != "jquery.js"
+        }
+
+        new JSDependencyManifest(
+          origin = manifest.origin,
+          libDeps = manifest.libDeps filter isOkToInclude,
+          requiresDOM = manifest.requiresDOM,
+          compliantSemantics = manifest.compliantSemantics
+        )
+      }
+    }
+  },
   libraryDependencies ++= Seq(
     "org.seleniumhq.selenium" % "selenium-server" % "2.52.0",
     "org.seleniumhq.selenium" % "selenium-firefox-driver" % "2.52.0",
@@ -40,16 +59,38 @@ lazy val client = (project in file("client")).settings(
   scalaVersion := scalaV,
   persistLauncher := true,
   persistLauncher in Test := false,
+  jsManifestFilter := {
+    import org.scalajs.core.tools.jsdep.{JSDependencyManifest, JSDependency}
+
+    (seq: Traversable[JSDependencyManifest]) => {
+      seq map { manifest =>
+
+        def isOkToInclude(jsDep: JSDependency): Boolean = {
+          jsDep.resourceName != "jquery.js"
+        }
+
+        new JSDependencyManifest(
+          origin = manifest.origin,
+          libDeps = manifest.libDeps filter isOkToInclude,
+          requiresDOM = manifest.requiresDOM,
+          compliantSemantics = manifest.compliantSemantics
+        )
+      }
+    }
+  },
   libraryDependencies ++= Seq(
 
 
 "org.scala-js" %%% "scalajs-dom" % "0.8.0",
     "be.doeraene" %%% "scalajs-jquery" % "0.8.0",
     "com.lihaoyi" %%% "scalatags" % "0.5.2",
-    "com.lihaoyi" %%% "utest" % "0.3.1"
+    "com.lihaoyi" %%% "utest" % "0.3.1",
+    "com.github.japgolly.scalacss" %%% "ext-scalatags" % "0.4.0",
+    "com.github.japgolly.scalacss" %%% "core" % "0.4.0"
 
 
-  )
+  ),
+  testFrameworks += new TestFramework("utest.runner.Framework")
 ).enablePlugins(ScalaJSPlugin, ScalaJSPlay).
   dependsOn(sharedJs)
 
@@ -60,6 +101,8 @@ lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared")).
 lazy val sharedJvm = shared.jvm
 lazy val sharedJs = shared.js
 
+scapegoatVersion := "1.1.0"
+
 // loads the Play project at sbt startup
 onLoad in Global := (Command.process("project server", _: State)) compose (onLoad in Global).value
 
@@ -67,6 +110,8 @@ onLoad in Global := (Command.process("project server", _: State)) compose (onLoa
 EclipseKeys.skipParents in ThisBuild := false
 // Compile the project before generating Eclipse files, so that generated .scala or .class files for views and routes are present
 EclipseKeys.preTasks := Seq(compile in (server, Compile))
+
+
 
 
 
